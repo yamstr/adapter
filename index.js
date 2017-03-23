@@ -82,7 +82,7 @@ if (commander.start) {
 	});
 
 	koaRouter.post('/webhook', async (ctx, next) => {
-		if (['/start', '/getwh'].includes(ctx.request.body.message.text)) {
+		if (['/start', '/getwh', '/getwh@adapterbot'].includes(ctx.request.body.message.text)) {
 			let message = `WebHook URL: ${Adapter.getWebHookURL(config.salt, ctx.request.body.message.chat.id)}?text=hello`;
 			let url = `https://api.telegram.org/bot${config.token}/sendMessage?chat_id=${ctx.request.body.message.chat.id}&text=${message}`;
 
