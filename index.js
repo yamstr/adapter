@@ -97,7 +97,7 @@ if (commander.start) {
 
 	koaRouter.get('/:token/:id', async (ctx, next) => {
 		if (ctx.params.token == Adapter.getToken(config.salt, ctx.params.id)) {
-			console.log(await Adapter.request(`https://api.telegram.org/bot${config.token}/sendMessage?chat_id=${ctx.params.id}&text=${ctx.request.query.text}`));
+			console.log(await Adapter.request(`https://api.telegram.org/bot${config.token}/sendMessage?chat_id=${ctx.params.id}&text=${encodeURIComponent(ctx.request.query.text)}`));
 		}
 
 		ctx.status = 200;
