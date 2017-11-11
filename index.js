@@ -37,7 +37,7 @@ class Adapter {
 	}
 }
 
-koaRouter.post('/webhook', async (ctx, next) => {
+koaRouter.post('/webhook', koaBody, async (ctx, next) => {
 	if (['/start', '/getwh', '/getwh@adapterbot'].includes(ctx.request.body.message.text)) {
 		Adapter.sendMessage(ctx.request.body.message.chat.id, `WebHook URL: ${Adapter.getWebHookURL(ctx.request.body.message.chat.id)}?text=hello`);
 	}
