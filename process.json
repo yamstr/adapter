@@ -1,9 +1,0 @@
-{
-	apps: [{
-		name: "adapter",
-		interpreter_args: "--harmony",
-		script: "./index.js",
-		args: "start",
-		watch: true
-	}]
-}
