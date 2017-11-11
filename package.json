@@ -12,14 +12,14 @@
     "node": "7.9.0"
   },
   "dependencies": {
-    "config": "^1.25.1",
-    "koa": "^2.2.0",
-    "koa-body": "^2.0.0",
-    "koa-logger": "^2.0.1",
-    "koa-router": "^7.1.1",
-    "koa-static": "^3.0.0",
-    "koa-views": "^6.0.2",
-    "pug": "^2.0.0-beta.12",
-    "request": "^2.81.0"
+    "config": "^1.28.1",
+    "koa": "^2.4.1",
+    "koa-body": "^2.5.0",
+    "koa-logger": "^3.1.0",
+    "koa-router": "^7.2.1",
+    "koa-static": "^4.0.1",
+    "koa-views": "^6.1.1",
+    "pug": "^2.0.0-rc.4",
+    "request": "^2.83.0"
   }
 }
