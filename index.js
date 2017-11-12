@@ -13,7 +13,7 @@ const app = new koa();
 
 class Adapter {
 	static getToken(chat_id) {
-		return crypto.createHash('md5').update((config.salt || process.env.SALT) + chat_id).digest('hex');
+		return crypto.createHash('md5').update((process.env.SALT || config.salt) + chat_id).digest('hex');
 	}
 
 	static getWebHookURL(chat_id) {
@@ -23,7 +23,7 @@ class Adapter {
 	static sendMessage(chat_id, text) {
 		return new Promise((resolve, reject) => {
 			request.post({
-				url: `https://api.telegram.org/bot${config.telegram.token || process.env.TELEGRAM_TOKEN}/sendMessage`,
+				url: `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN || config.telegram.token}/sendMessage`,
 				form: {
 					chat_id: chat_id,
 					text: text
@@ -94,4 +94,4 @@ app.use(koaStatic(__dirname + '/public'));
 app.use(koaViews(__dirname + '/views', { extension: 'pug' }));
 app.use(koaRouter.routes());
 
-app.listen(config.port || process.env.PORT);
+app.listen(process.env.PORT || config.port);
