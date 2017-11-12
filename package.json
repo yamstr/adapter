@@ -1,15 +1,15 @@
 {
-  "name": "app",
+  "name": "Adapter",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple way to post messages from external sources into Telegram",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "",
+  "author": "Andrey V.",
   "license": "ISC",
   "engines": {
-    "node": "7.9.0"
+    "node": "9.1.0"
   },
   "dependencies": {
     "config": "^1.28.1",

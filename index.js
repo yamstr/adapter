@@ -13,7 +13,7 @@ const app = new koa();
 
 class Adapter {
 	static getToken(chat_id) {
-		return crypto.createHash('md5').update((process.env.SALT || config.salt) + chat_id).digest('hex');
+		return crypto.createHash('md5').update((config.salt || process.env.SALT) + chat_id).digest('hex');
 	}
 
 	static getWebHookURL(chat_id) {
@@ -21,28 +21,28 @@ class Adapter {
 	}
 
 	static sendMessage(chat_id, text) {
-		request.post({
-			url: `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN || config.telegram.token}/sendMessage`,
-			form: {
-				chat_id: chat_id,
-				text: text
-			}
-		}, (error, response, body) => {
-			if (error) {
-				console.error(error);
-			} else {
-				console.log(body);
-			}
+		return new Promise((resolve, reject) => {
+			request.post({
+				url: `https://api.telegram.org/bot${config.telegram.token || process.env.TELEGRAM_TOKEN}/sendMessage`,
+				form: {
+					chat_id: chat_id,
+					text: text
+				}
+			}, (error, response, body) => {
+				if (error) {
+					console.error(error);
+					reject(error);
+				} else {
+					console.log(body);
+					resolve(body);
+				}
+			});
 		});
 	}
 }
 
-koaRouter.post('/webhook', koaBody, async (ctx, next) => {
-	if (['/start', '/getwh', '/getwh@adapterbot'].includes(ctx.request.body.message.text)) {
-		Adapter.sendMessage(ctx.request.body.message.chat.id, `WebHook URL: ${Adapter.getWebHookURL(ctx.request.body.message.chat.id)}?text=hello`);
-	}
-
-	ctx.status = 200;
+koaRouter.all('/', async (ctx, next) => {
+	ctx.redirect('https://telegram.me/adapterbot');
 });
 
 koaRouter.all('/:token/:chat_id', koaBody, async (ctx, next) => {
@@ -52,8 +52,27 @@ koaRouter.all('/:token/:chat_id', koaBody, async (ctx, next) => {
 	if (ctx.method == 'POST') text = ctx.request.body.text;
 
 	if (ctx.params.token == Adapter.getToken(ctx.params.chat_id)) {
-		Adapter.sendMessage(ctx.params.chat_id, text);
-		ctx.status = 200;
+		await Adapter.sendMessage(ctx.params.chat_id, text)
+			.then(response => {
+				ctx.status = 200;
+			})
+			.catch(error => {
+				ctx.status = 400;
+			});
+	} else {
+		ctx.status = 400;
+	}
+});
+
+koaRouter.post('/webhook', koaBody, async (ctx, next) => {
+	if (['/start', '/getwh', '/getwh@adapterbot'].includes(ctx.request.body.message.text)) {
+		await Adapter.sendMessage(ctx.request.body.message.chat.id, `WebHook URL: ${Adapter.getWebHookURL(ctx.request.body.message.chat.id)}?text=hello`)
+			.then(response => {
+				ctx.status = 200;
+			})
+			.catch(error => {
+				ctx.status = 400;
+			});
 	} else {
 		ctx.status = 400;
 	}
@@ -75,4 +94,4 @@ app.use(koaStatic(__dirname + '/public'));
 app.use(koaViews(__dirname + '/views', { extension: 'pug' }));
 app.use(koaRouter.routes());
 
-app.listen(process.env.PORT || config.port);
+app.listen(config.port || process.env.PORT);
