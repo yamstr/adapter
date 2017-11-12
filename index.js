@@ -74,7 +74,7 @@ koaRouter.post('/webhook', koaBody, async (ctx, next) => {
 				ctx.status = 400;
 			});
 	} else {
-		ctx.status = 400;
+		ctx.status = 200;
 	}
 });
 
