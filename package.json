@@ -9,7 +9,7 @@
   "author": "Andrey V.",
   "license": "ISC",
   "engines": {
-    "node": "9.1.0"
+    "node": "7.9.0"
   },
   "dependencies": {
     "config": "^1.28.1",
