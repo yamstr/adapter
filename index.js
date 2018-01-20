@@ -26,7 +26,8 @@ class Adapter {
 				url: `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN || config.telegram.token}/sendMessage`,
 				form: {
 					chat_id: chat_id,
-					text: text
+					text: text,
+					disable_web_page_preview: true
 				}
 			}, (error, response, body) => {
 				if (error) {
@@ -52,7 +53,7 @@ koaRouter.all('/:token/:chat_id', koaBody, async (ctx, next) => {
 	if (ctx.method == 'POST') text = ctx.request.body.text;
 
 	if (ctx.params.token == Adapter.getToken(ctx.params.chat_id)) {
-		await Adapter.sendMessage(ctx.params.chat_id, text)
+		await Adapter.sendMessage(ctx.params.chat_id, `<code>${text}</code>`)
 			.then(response => {
 				ctx.status = 200;
 			})
