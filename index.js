@@ -27,6 +27,7 @@ class Adapter {
 				form: {
 					chat_id: chat_id,
 					text: text,
+					parse_mode: 'HTML',
 					disable_web_page_preview: true
 				}
 			}, (error, response, body) => {
