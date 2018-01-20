@@ -1,5 +1,5 @@
 {
-  "name": "Adapter",
+  "name": "adapter",
   "version": "1.0.0",
   "description": "A simple way to post messages from external sources into Telegram",
   "main": "index.js",
@@ -12,13 +12,13 @@
     "node": "9.1.0"
   },
   "dependencies": {
-    "config": "^1.28.1",
+    "config": "^1.29.2",
     "koa": "^2.4.1",
     "koa-body": "^2.5.0",
     "koa-logger": "^3.1.0",
-    "koa-router": "^7.2.1",
-    "koa-static": "^4.0.1",
-    "koa-views": "^6.1.1",
+    "koa-router": "^7.3.0",
+    "koa-static": "^4.0.2",
+    "koa-views": "^6.1.3",
     "pug": "^2.0.0-rc.4",
     "request": "^2.83.0"
   }
