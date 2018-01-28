@@ -80,7 +80,10 @@ koaRouter.post('/:token/:chat_id', koaBody, async (ctx, next) => {
 
 koaRouter.post('/webhook', koaBody, async (ctx, next) => {
 	if (['/start', '/help', '/help@adapterbot'].includes(ctx.request.body.message.text)) {
-		await Adapter.sendMessage(ctx.request.body.message.chat.id, `WebHook URL: ${Adapter.getWebHookURL(ctx.request.body.message.chat.id)}?text=hello`)
+		await Adapter.sendMessage({
+			chat_id: ctx.request.body.message.chat.id,
+			text: `WebHook URL: ${Adapter.getWebHookURL(ctx.request.body.message.chat.id)}?text=hello`
+		})
 			.then(response => {
 				ctx.status = 200;
 			})
