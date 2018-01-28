@@ -20,21 +20,18 @@ class Adapter {
 		return `https://adapter.yamstr.com/${this.getToken(chat_id)}/${chat_id}`;
 	}
 
-	static sendMessage(chat_id, text) {
+	static sendMessage(message) {
 		return new Promise((resolve, reject) => {
 			request.post({
 				url: `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN || config.telegram.token}/sendMessage`,
-				form: {
-					chat_id: chat_id,
-					text: text
-				}
+				form: message
 			}, (error, response, body) => {
 				if (error) {
-					console.error(error);
 					reject(error);
+					console.error(error);
 				} else {
-					console.log(body);
-					resolve(body);
+					resolve(JSON.parse(body));
+					console.log(JSON.parse(body));
 				}
 			});
 		});
@@ -45,22 +42,39 @@ koaRouter.all('/', async (ctx, next) => {
 	ctx.redirect('https://telegram.me/adapterbot');
 });
 
-koaRouter.all('/:token/:chat_id', koaBody, async (ctx, next) => {
-	let text;
-
-	if (ctx.method == 'GET') text = ctx.request.query.text;
-	if (ctx.method == 'POST') text = ctx.request.body.text;
-
+koaRouter.get('/:token/:chat_id', async (ctx, next) => {
 	if (ctx.params.token == Adapter.getToken(ctx.params.chat_id)) {
-		await Adapter.sendMessage(ctx.params.chat_id, text)
-			.then(response => {
-				ctx.status = 200;
+		await Adapter.sendMessage(Object.assign({ chat_id: ctx.params.chat_id }, ctx.request.query))
+			.then(async response => {
+				if (response.ok) {
+					await ctx.render('success', { message: 'Message Sent' });
+				} else {
+					ctx.throw(response.error_code, response.description, response);
+				}
 			})
 			.catch(error => {
-				ctx.status = 400;
+				ctx.throw(400, 'Bad Request', error);
 			});
 	} else {
-		ctx.status = 400;
+		ctx.throw(400, 'Bad Request');
+	}
+});
+
+koaRouter.post('/:token/:chat_id', koaBody, async (ctx, next) => {
+	if (ctx.params.token == Adapter.getToken(ctx.params.chat_id)) {
+		await Adapter.sendMessage(Object.assign({ chat_id: ctx.params.chat_id }, ctx.request.body))
+			.then(async response => {
+				if (response.ok) {
+					await ctx.render('success', { message: 'Message Sent' });
+				} else {
+					ctx.throw(response.error_code, response.description, response);
+				}
+			})
+			.catch(error => {
+				ctx.throw(400, 'Bad Request', error);
+			});
+	} else {
+		ctx.throw(400, 'Bad Request');
 	}
 });
 
@@ -81,11 +95,10 @@ koaRouter.post('/webhook', koaBody, async (ctx, next) => {
 app.use(async (ctx, next) => {
 	try {
 		await next();
+		if (ctx.status == 404) ctx.throw(404, 'Not Found');
 	} catch (error) {
 		ctx.status = error.status || 500;
-		ctx.body = {
-			message: error.message
-		};
+		await ctx.render('error', { message: error.message });
 	}
 });
 
