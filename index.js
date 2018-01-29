@@ -83,8 +83,9 @@ koaRouter.post('/webhook', koaBody, async (ctx, next) => {
 	if (['/start', '/help', '/help@adapterbot'].includes(ctx.request.body.message.text)) {
 		await Adapter.sendMessage({
 			chat_id: ctx.request.body.message.chat.id,
-			text: pug.renderFile('./views/help.pug', { url: Adapter.getWebHookURL(ctx.request.body.message.chat.id) }),
-			disable_web_page_preview: true
+			disable_web_page_preview: true,
+			parse_mode: 'Markdown',
+			text: pug.renderFile('./views/help.pug', { url: Adapter.getWebHookURL(ctx.request.body.message.chat.id) })
 		})
 			.then(response => {
 				ctx.status = 200;
