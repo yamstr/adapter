@@ -80,9 +80,24 @@ koaRouter.post('/:token/:chat_id', koaBody, async (ctx, next) => {
 
 koaRouter.post('/webhook', koaBody, async (ctx, next) => {
 	if (['/start', '/help', '/help@adapterbot'].includes(ctx.request.body.message.text)) {
+		let text = `
+		The bot is a simple way to post messages from external sources into Telegram.
+
+		Your address for sending messages: ${Adapter.getWebHookURL(ctx.request.body.message.chat.id)}
+
+		List of supported parameters for text messages:
+
+		text (string, required) - text of the message you want to send;
+		parse_mode (string, optional) - send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message;
+		disable_web_page_preview (boolean, optional) - disables link previews for links in this message;
+		disable_notification (boolean, optional) - sends the message silently, users will receive a notification with no sound.
+
+		Example: ${Adapter.getWebHookURL(ctx.request.body.message.chat.id)}?text=hello`;
+
 		await Adapter.sendMessage({
 			chat_id: ctx.request.body.message.chat.id,
-			text: `WebHook URL: ${Adapter.getWebHookURL(ctx.request.body.message.chat.id)}?text=hello`
+			text: text,
+			disable_web_page_preview: true
 		})
 			.then(response => {
 				ctx.status = 200;
