@@ -45,7 +45,7 @@ koaRouter.all('/', async (ctx, next) => {
 
 koaRouter.get('/:token/:chat_id', async (ctx, next) => {
 	if (ctx.params.token == Adapter.getToken(ctx.params.chat_id)) {
-		await Adapter.sendMessage(Object.assign({ chat_id: ctx.params.chat_id }, ctx.request.query))
+		await Adapter.sendMessage(Object.assign({}, ctx.request.query, { chat_id: ctx.params.chat_id }))
 			.then(async response => {
 				if (response.ok) {
 					await ctx.render('success', { message: 'Message Sent' });
@@ -63,7 +63,7 @@ koaRouter.get('/:token/:chat_id', async (ctx, next) => {
 
 koaRouter.post('/:token/:chat_id', koaBody, async (ctx, next) => {
 	if (ctx.params.token == Adapter.getToken(ctx.params.chat_id)) {
-		await Adapter.sendMessage(Object.assign({ chat_id: ctx.params.chat_id }, ctx.request.body))
+		await Adapter.sendMessage(Object.assign({}, ctx.request.body, { chat_id: ctx.params.chat_id }))
 			.then(async response => {
 				if (response.ok) {
 					await ctx.render('success', { message: 'Message Sent' });
