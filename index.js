@@ -79,21 +79,25 @@ koaRouter.post('/:token/:chat_id', koaBody, async (ctx, next) => {
 	}
 });
 
-koaRouter.post('/webhook', koaBody, async (ctx, next) => {
-	if (['/start', '/help', '/help@adapterbot'].includes(ctx.request.body.message.text)) {
-		await Adapter.sendMessage({
-			chat_id: ctx.request.body.message.chat.id,
-			text: pug.renderFile('./views/help.pug', { url: Adapter.getWebHookURL(ctx.request.body.message.chat.id) }),
-			disable_web_page_preview: true
-		})
-			.then(response => {
-				ctx.status = 200;
+koaRouter.post('/:token/webhook', koaBody, async (ctx, next) => {
+	if (ctx.params.token == (process.env.TELEGRAM_TOKEN || config.telegram.token)) {
+		if (['/start', '/help', '/help@adapterbot'].includes(ctx.request.body.message.text)) {
+			await Adapter.sendMessage({
+				chat_id: ctx.request.body.message.chat.id,
+				text: pug.renderFile('./views/help.pug', { url: Adapter.getWebHookURL(ctx.request.body.message.chat.id) }),
+				disable_web_page_preview: true
 			})
-			.catch(error => {
-				ctx.status = 400;
-			});
+				.then(response => {
+					ctx.status = 200;
+				})
+				.catch(error => {
+					ctx.status = 400;
+				});
+		} else {
+			ctx.status = 200;
+		}
 	} else {
-		ctx.status = 200;
+		ctx.status = 400;
 	}
 });
 
