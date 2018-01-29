@@ -43,6 +43,28 @@ koaRouter.all('/', async (ctx, next) => {
 	ctx.redirect('https://telegram.me/adapterbot');
 });
 
+koaRouter.post('/:token/webhook', koaBody, async (ctx, next) => {
+	if (ctx.params.token == (process.env.TELEGRAM_TOKEN || config.telegram.token)) {
+		if (['/start', '/help', '/help@adapterbot'].includes(ctx.request.body.message.text)) {
+			await Adapter.sendMessage({
+				chat_id: ctx.request.body.message.chat.id,
+				text: pug.renderFile('./views/help.pug', { url: Adapter.getWebHookURL(ctx.request.body.message.chat.id) }),
+				disable_web_page_preview: true
+			})
+				.then(response => {
+					ctx.status = 200;
+				})
+				.catch(error => {
+					ctx.status = 400;
+				});
+		} else {
+			ctx.status = 200;
+		}
+	} else {
+		ctx.status = 400;
+	}
+});
+
 koaRouter.get('/:token/:chat_id', async (ctx, next) => {
 	if (ctx.params.token == Adapter.getToken(ctx.params.chat_id)) {
 		await Adapter.sendMessage(Object.assign({}, ctx.request.query, { chat_id: ctx.params.chat_id }))
@@ -76,28 +98,6 @@ koaRouter.post('/:token/:chat_id', koaBody, async (ctx, next) => {
 			});
 	} else {
 		ctx.throw(400, 'Bad Request');
-	}
-});
-
-koaRouter.post('/:token/webhook', koaBody, async (ctx, next) => {
-	if (ctx.params.token == (process.env.TELEGRAM_TOKEN || config.telegram.token)) {
-		if (['/start', '/help', '/help@adapterbot'].includes(ctx.request.body.message.text)) {
-			await Adapter.sendMessage({
-				chat_id: ctx.request.body.message.chat.id,
-				text: pug.renderFile('./views/help.pug', { url: Adapter.getWebHookURL(ctx.request.body.message.chat.id) }),
-				disable_web_page_preview: true
-			})
-				.then(response => {
-					ctx.status = 200;
-				})
-				.catch(error => {
-					ctx.status = 400;
-				});
-		} else {
-			ctx.status = 200;
-		}
-	} else {
-		ctx.status = 400;
 	}
 });
 
