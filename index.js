@@ -18,7 +18,7 @@ class Adapter {
 	}
 
 	static getWebHookURL(chat_id) {
-		return `https://adapter.substation.ru/${this.getToken(chat_id)}/${chat_id}`;
+		return `https://adapterbot.herokuapp.com/${this.getToken(chat_id)}/${chat_id}`;
 	}
 
 	static sendMessage(message) {
